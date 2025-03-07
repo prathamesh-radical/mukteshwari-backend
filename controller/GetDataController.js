@@ -56,23 +56,6 @@ export const GetRequests = (req, res) => {
     });
 }
 
-export const GetBranchRequests = (req, res) => {
-    const query = `
-        SELECT requests.id, requests.user_id, requests.event_id, users.first_name, users.last_name, users.phone_number, users.branch_id, events.event_name AS eventName, requests.status, requests.date
-        FROM requests
-        JOIN users ON requests.user_id = users.user_id
-        JOIN events ON requests.event_id = events.event_id
-    `;
-
-    db.query(query, (err, results) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: "Database query failed" });
-        }
-        res.status(200).json({ requests: results, success: true });
-    });
-}
-
 export const GetBranchesByCity = async (req, res) => {
     try {
         const query = `SELECT branch_city, branch_name FROM branches ORDER BY branch_city`;
@@ -89,3 +72,28 @@ export const GetBranchesByCity = async (req, res) => {
         res.status(500).json({ error: "Internal Server Error" });
     }
 };
+
+export const GetBranchRequests = (req, res) => {
+    const { branch_id } = req.query;
+
+    if (!branch_id) {
+        return res.status(400).json({ error: "branch_id is required" });
+    }
+    const query = `
+        SELECT requests.id, requests.user_id, requests.event_id, 
+        users.first_name AS firstName, users.last_name AS lastName, users.phone_number, events.event_name AS eventName, 
+        requests.status, requests.date
+        FROM requests
+        JOIN users ON requests.user_id = users.user_id
+        JOIN events ON requests.event_id = events.event_id
+        WHERE users.branch_id = ?
+    `;
+    db.query(query, [branch_id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Database query failed" });
+        }
+
+        res.status(200).json({ requests: results, success: true });
+    });
+}

@@ -89,14 +89,14 @@ export const UserLogin = async (req, res) => {
                         { id: result[0].user_id, phone_number: result[0].phone_number },
                         process.env.JWT_SECRET,
                         { expiresIn: "2h" }
-                    )
+                    );
                     return res.status(200).json({
-                        message: `Welcome ${result[0].name}! You have successfully logged in. 🎉`,
+                        message: `Welcome ${result[0].first_name + " " + result[0].last_name}! You have successfully logged in. 🎉`,
                         success: true,
                         userId: result[0].user_id,
                         userToken: token,
                         userNumber: phone_number,
-                        userName: result[0].name,
+                        userName: result[0].first_name + " " + result[0].last_name,
                     });
                 } else {
                     return res.status(401).json({ message: "Invalid Credential", success: false });
