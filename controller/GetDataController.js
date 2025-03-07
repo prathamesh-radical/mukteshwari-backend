@@ -14,18 +14,19 @@ export const GetBranches = async (req, res) => {
 }
 
 export const GetUsers = (req, res) => {
-    const sql = 'SELECT * FROM users';
-    try {
-        db.query(sql, (err, results) => {
-            if (err) {
-                console.error(err.message);
-                return res.status(500).send({ message: 'Server error', success: false });
-            }
-            res.status(200).json({ message: "Users fetched successsfully", users: results, success: true });
-        });
-    } catch (error) {
-        res.status(500).json({ message: "Internal Server Error", success: false })
+    const { branch_id } = req.query;
+
+    if (!branch_id) {
+        return res.status(400).json({ message: "Branch ID is required", success: false });
     }
+
+    db.query('SELECT * FROM users WHERE branch_id = ?', [branch_id], (err, results) => {
+        if (err) {
+            console.error("Error fetching users", err.message);
+            return res.status(500).json({ message: 'Server error', success: false });
+        }
+        res.status(200).json({ message: "Users fetched successsfully", users: results, success: true });
+    })
 }
 
 export const GetEvent = (req, res) => {
