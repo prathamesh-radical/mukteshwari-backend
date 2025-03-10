@@ -6,8 +6,8 @@ import {
 const RequestsRoute = express.Router();
 
 RequestsRoute.post("/requests", AddRequests);
-RequestsRoute.put("/requests", UpdateRequests);
-RequestsRoute.put("/requests/bulk", UpdateBulkRequests);
+RequestsRoute.post("/requests/single", UpdateRequests);
+RequestsRoute.post("/requests/bulk", UpdateBulkRequests);
 RequestsRoute.post("/register-requests", InsertRequests);
 RequestsRoute.post("/register-requests/bulk", InsertRequestsInBulk);
 

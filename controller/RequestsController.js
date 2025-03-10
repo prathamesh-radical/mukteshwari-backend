@@ -51,8 +51,8 @@ export const AddRequests = async (req, res) => {
 }
 
 export const UpdateRequests = (req, res) => {
-    const { id } = req.params;
-    const { status } = req.body;
+    const { id, status } = req.body;
+
     const query = 'UPDATE requests SET status = ? WHERE id = ?';
     db.query(query, [status, id], (err, result) => {
         if (err) throw err;
@@ -73,8 +73,6 @@ export const UpdateBulkRequests = (req, res) => {
             console.error('Error updating bulk requests:', err);
             return res.status(500).send({ message: 'Failed to update bulk requests' });
         }
-        console.log("Successfully updated bulk requests ", result);
-
         res.send({ message: 'Bulk requests status updated successfully' });
     });
 }
