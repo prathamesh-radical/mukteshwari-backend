@@ -115,59 +115,6 @@ export const InsertRequestsInBulk = (req, res) => {
         return res.status(400).json({ message: "Invalid request data", success: false });
     }
 
-    const values = requests.flatMap(req => [req.user_id, req.date]);
-
-    const selectQuery = `SELECT user_id, date FROM requests WHERE (user_id, date) IN (${requests.map(() => "(?, ?)").join(", ")})`;
-
-    db.query(selectQuery, values, (err, result) => {
-        if (err) {
-            console.error("Error:", err);
-            return res.status(500).json({ message: "Error checking request", success: false });
-        }
-
-        // Separate requests into updates and inserts
-        const existingRequests = new Set(result.map(row => `${row.user_id}_${row.date}`));
-        const updates = requests.filter(req => existingRequests.has(`${req.user_id}_${req.date}`));
-        const inserts = requests.filter(req => !existingRequests.has(`${req.user_id}_${req.date}`));
-
-        if (updates.length > 0) {
-            const updateQuery = `
-                UPDATE requests 
-                SET status = CASE 
-                ${updates.map(() => "WHEN user_id = ? AND date = ? THEN ?").join(" ")}
-                ELSE status END 
-                WHERE (user_id, date) IN (${updates.map(() => "(?, ?)").join(", ")})`;
-
-            const updateValues = updates.flatMap(req => [req.user_id, req.date, req.status])
-                .concat(updates.flatMap(req => [req.user_id, req.date]));
-
-            db.query(updateQuery, updateValues, (err) => {
-                if (err) {
-                    console.error("Error:", err);
-                    return res.status(500).json({ message: "Error updating request", success: false });
-                }
-
-                if (inserts.length > 0) {
-                    insertRequests(inserts, res);
-                } else {
-                    res.status(200).json({ message: "Requests updated successfully", success: true });
-                }
-            });
-        } else if (inserts.length > 0) {
-            insertRequests(inserts, res);
-        } else {
-            res.status(200).json({ message: "No updates or inserts needed", success: true });
-        }
-    });
-};
-
-export const InsertBulk = (req, res) => {
-    const requests = req.body;
-
-    if (!Array.isArray(requests) || requests.length === 0) {
-        return res.status(400).json({ message: "Invalid request data", success: false });
-    }
-
     // Separate requests into updates and inserts
     const updates = [];
     const inserts = [];
