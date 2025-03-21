@@ -115,78 +115,26 @@ export const InsertRequestsInBulk = (req, res) => {
         return res.status(400).json({ message: "Invalid request data", success: false });
     }
 
-    // Separate requests into updates and inserts
-    const updates = [];
-    const inserts = [];
+    const insertQuery = `
+        INSERT INTO requests (user_id, event_id, date, status) 
+        VALUES ? 
+        ON DUPLICATE KEY UPDATE 
+        status = VALUES(status)
+    `;
 
-    db.query(
-        `SELECT user_id, date FROM requests WHERE (user_id, date) IN (${requests.map(() => "(?, ?)").join(", ")})`,
-        requests.flatMap(req => [req.user_id, req.date]),
-        (err, result) => {
-            if (err) {
-                console.log("Error:", err);
-                return res.status(500).json({ message: 'Error checking request', success: false });
-            }
+    // Prepare the values for insertion
+    const values = requests.map(req => [req.user_id, req.event_id, req.date, req.status]);
 
-            // Determine which requests need to be updated and which need to be inserted
-            const existingRequests = new Set(result.map(row => `${row.user_id}-${row.date}`));
-
-            requests.forEach(req => {
-                if (existingRequests.has(`${req.user_id}-${req.date}`)) {
-                    updates.push(req);
-                } else {
-                    inserts.push(req);
-                }
-            });
-
-            // Perform updates if there are any
-            if (updates.length > 0) {
-                const updateQuery = `
-                    UPDATE requests 
-                    SET status = CASE 
-                        ${updates.map(() => "WHEN user_id = ? AND date = ? THEN ? ").join(" ")}
-                    END 
-                    WHERE (user_id, date) IN (${updates.map(() => "(?, ?)").join(", ")})
-                `;
-
-                db.query(
-                    updateQuery,
-                    updates.flatMap(req => [req.user_id, req.date, req.status])
-                        .concat(updates.flatMap(req => [req.user_id, req.date])),
-                    (err, result) => {
-                        if (err) {
-                            console.log("Error:", err);
-                            return res.status(500).json({ message: 'Error updating request', success: false });
-                        }
-                    }
-                );
-            }
-
-            // Perform inserts if there are any
-            if (inserts.length > 0) {
-                const insertQuery = `
-                    INSERT INTO requests (user_id, event_id, date, status) VALUES ?
-                `;
-
-                db.query(
-                    insertQuery,
-                    [inserts.map(req => [req.user_id, req.event_id, req.date, req.status])],
-                    (err, result) => {
-                        if (err) {
-                            console.log("Error:", err);
-                            return res.status(500).json({ message: 'Error inserting request', success: false });
-                        }
-                    }
-                );
-            }
-
-            // Send a success response
-            res.status(200).json({ 
-                message: 'Bulk operation completed successfully', 
-                success: true,
-                updates: updates.length,
-                inserts: inserts.length
-            });
+    db.query(insertQuery, [values], (err, result) => {
+        if (err) {
+            console.log("Error:", err);
+            return res.status(500).json({ message: 'Error inserting/updating requests', success: false });
         }
-    );
+
+        res.status(200).json({ 
+            message: 'Bulk operation completed successfully', 
+            success: true,
+            affectedRows: result.affectedRows
+        });
+    });
 };
