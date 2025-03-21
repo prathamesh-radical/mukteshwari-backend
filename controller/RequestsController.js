@@ -114,8 +114,12 @@ export const InsertRequestsInBulk = (req, res) => {
 
     const sql = 'INSERT INTO requests (user_id, event_id, date, status) VALUES ?';
     const values = requests?.map(req => [req.user_id, req.event_id, req.date, req.status]);
+
     db.query(sql, [values], (err, result) => {
-        if (err) throw err;
-        res.send('Bulk requests added...');
+        if (err) {
+            console.error('Error inserting bulk requests:', err);
+            return res.status(500).send({ message: 'Failed to insert bulk requests' });
+        }
+        res.send({ message: 'Bulk requests added successfully' });
     });
 }
