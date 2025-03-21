@@ -113,7 +113,7 @@ export const InsertRequestsInBulk = (req, res) => {
     console.log("Requests in InsertRequestsInBulk: ", requests);
 
     const sql = 'INSERT INTO requests (user_id, event_id, date, status) VALUES ?';
-    const values = requests.map(req => [req.user_id, req.event_id, req.date, req.status]);
+    const values = requests?.map(req => [req.user_id, req.event_id, req.date, req.status]);
     db.query(sql, [values], (err, result) => {
         if (err) throw err;
         res.send('Bulk requests added...');
