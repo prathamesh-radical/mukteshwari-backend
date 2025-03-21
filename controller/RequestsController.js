@@ -110,31 +110,12 @@ export const InsertRequests = (req, res) => {
 
 export const InsertRequestsInBulk = (req, res) => {
     const requests = req.body;
+    console.log("Requests in InsertRequestsInBulk: ", requests);
 
-    if (!Array.isArray(requests) || requests.length === 0) {
-        return res.status(400).json({ message: "Invalid request data", success: false });
-    }
-
-    const insertQuery = `
-        INSERT INTO requests (user_id, event_id, date, status) 
-        VALUES ? 
-        ON DUPLICATE KEY UPDATE 
-        status = VALUES(status)
-    `;
-
-    // Prepare the values for insertion
+    const sql = 'INSERT INTO requests (user_id, event_id, date, status) VALUES ?';
     const values = requests.map(req => [req.user_id, req.event_id, req.date, req.status]);
-
-    db.query(insertQuery, [values], (err, result) => {
-        if (err) {
-            console.log("Error:", err);
-            return res.status(500).json({ message: 'Error inserting/updating requests', success: false });
-        }
-
-        res.status(200).json({ 
-            message: 'Bulk operation completed successfully', 
-            success: true,
-            affectedRows: result.affectedRows
-        });
+    db.query(sql, [values], (err, result) => {
+        if (err) throw err;
+        res.send('Bulk requests added...');
     });
-};
+}
