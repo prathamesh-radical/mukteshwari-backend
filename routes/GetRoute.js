@@ -1,10 +1,10 @@
 import express from "express";
-import { GetBranches, GetBranchesByCity, GetBranchRequests, GetEvent, GetRequests, GetUserById, GetUsers } from "../controller/GetDataController.js";
+import { GetBranches, GetBranchesByCity, GetBranchRequests, GetEvent, GetRequests, GetUserByUserId, GetUsersByBranchId } from "../controller/GetDataController.js";
 
 const GetRoutes = express.Router();
 
-GetRoutes.get("/users", GetUsers);
-GetRoutes.get("/userbyid", GetUserById);
+GetRoutes.get("/users-by-branch-id", GetUsersByBranchId);
+GetRoutes.get("/user-by-user-id", GetUserByUserId);
 GetRoutes.get("/get-branches", GetBranches);
 GetRoutes.get("/events", GetEvent);
 GetRoutes.get("/requests", GetRequests);
