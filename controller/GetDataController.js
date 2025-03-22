@@ -59,7 +59,7 @@ export const GetRequests = (req, res) => {
 
 export const GetBranchesByCity = async (req, res) => {
     try {
-        const query = `SELECT branch_city, branch_name FROM branches ORDER BY branch_city`;
+        const query = `SELECT branch_city, branch_name, branch_id FROM branches ORDER BY branch_city`;
 
         db.query(query, (err, results) => {
             if (err) {
