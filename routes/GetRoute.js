@@ -4,6 +4,7 @@ import { GetBranches, GetBranchesByCity, GetBranchRequests, GetEvent, GetRequest
 const GetRoutes = express.Router();
 
 GetRoutes.get("/users", GetUsers);
+GetRoutes.get("/userbyid", GetUserById);
 GetRoutes.get("/get-branches", GetBranches);
 GetRoutes.get("/events", GetEvent);
 GetRoutes.get("/requests", GetRequests);

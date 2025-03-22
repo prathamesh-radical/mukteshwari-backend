@@ -13,6 +13,22 @@ export const GetBranches = async (req, res) => {
     }
 }
 
+export const GetUserById = (req, res) => {
+    const { user_id } = req.query;
+
+    if (!user_id) {
+        return res.status(400).json({ message: "User ID is required", success: false });
+    }
+
+    db.query('SELECT * FROM users WHERE branch_id = ?', [user_id], (err, results) => {
+        if (err) {
+            console.error("Error fetching users", err.message);
+            return res.status(500).json({ message: 'Server error', success: false });
+        }
+        res.status(200).json({ message: "Users fetched successsfully", users: results, success: true });
+    })
+}
+
 export const GetUsers = (req, res) => {
     const { branch_id } = req.query;
 
