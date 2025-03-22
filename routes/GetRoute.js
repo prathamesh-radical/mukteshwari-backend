@@ -1,5 +1,5 @@
 import express from "express";
-import { GetBranches, GetBranchesByCity, GetBranchRequests, GetEvent, GetRequests, GetUsers } from "../controller/GetDataController.js";
+import { GetBranches, GetBranchesByCity, GetBranchRequests, GetEvent, GetRequests, GetUserById, GetUsers } from "../controller/GetDataController.js";
 
 const GetRoutes = express.Router();
 
