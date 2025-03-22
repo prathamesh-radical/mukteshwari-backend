@@ -20,7 +20,7 @@ export const GetUserById = (req, res) => {
         return res.status(400).json({ message: "User ID is required", success: false });
     }
 
-    db.query('SELECT * FROM users WHERE branch_id = ?', [user_id], (err, results) => {
+    db.query('SELECT * FROM users WHERE user_id = ?', [user_id], (err, results) => {
         if (err) {
             console.error("Error fetching users", err.message);
             return res.status(500).json({ message: 'Server error', success: false });
