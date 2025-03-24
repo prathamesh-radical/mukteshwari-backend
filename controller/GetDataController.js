@@ -67,6 +67,7 @@ export const GetRequests = (req, res) => {
         FROM requests
         JOIN users ON requests.user_id = users.user_id
         JOIN events ON requests.event_id = events.event_id
+        JOIN branches ON users.branch_id = branches.branch_id
     `;
     db.query(query, (err, results) => {
         if (err) throw err;
