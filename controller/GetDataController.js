@@ -63,7 +63,9 @@ export const GetEvent = (req, res) => {
 
 export const GetRequests = (req, res) => {
     const query = `
-        SELECT requests.id, requests.user_id, requests.event_id, users.first_name, users.last_name, events.event_name, events.recurrence_day, requests.status, requests.date, branches.branch_id
+        SELECT requests.id, requests.user_id, requests.event_id, users.first_name, users.last_name, 
+               events.event_name, events.recurrence_day, requests.status, requests.date, 
+               branches.branch_id  -- Include branch_id from branches table
         FROM requests
         JOIN users ON requests.user_id = users.user_id
         JOIN events ON requests.event_id = events.event_id
